@@ -6,7 +6,7 @@ import praw, datetime, time, requests, sys
 username=""
 password=""
 
-#something to identify yourself to reddit (e.g. "bitcoin info updater v1.0 by /u/example")
+#something to identify yourself to reddit (e.g. "groestlcoin info updater v1.0 by /u/example")
 useragent=""
 
 #time to sleep in seconds after a network error:
@@ -52,11 +52,11 @@ def main(useragent, username, password):
 	print "Success! View at https://reddit.com/" + post.id
 
 def createTitleSkeleton(currTime):
-	title="Bitcoin Network Status Update " + currTime.strftime('%A, %B %d, %Y')
+	title="Groestlcoin Network Status Update " + currTime.strftime('%A, %B %d, %Y')
 	return title
 
 def createDescriptionSkeleton(currTime):
-	description="###Status of the Bitcoin network as of " + currTime.strftime('%A, %B %d, %Y') + " at " + currTime.strftime('%H:%M:%S') + " EST:"
+	description="###Status of the Groestlcoin network as of " + currTime.strftime('%A, %B %d, %Y') + " at " + currTime.strftime('%H:%M:%S') + " EST:"
 	return description
 
 def getData():
@@ -64,58 +64,34 @@ def getData():
 	description=nl
 
 	#get and format data:
-	bcStats=requests.get('https://api.smartbit.com.au/v1/blockchain/totals').json()['totals']
-	block_count=int(bcStats['block_count'])
-	totalBtc=float("%.8f" % float(bcStats['currency']))
-
-	bcStatsDaily=requests.get('https://api.smartbit.com.au/v1/blockchain/stats').json()['stats']
-	difficulty=float(bcStatsDaily['avg_difficulty'])
-
-	blocks_day=int(bcStatsDaily['block_count'])
-	outputs_day=float("%.8f" % float(bcStatsDaily['output_amount']))
-	fees_day=float("%.8f" % float(bcStatsDaily['fees']))
-	hashrate_day=float(bcStatsDaily['hash_rate_gh'])
-	avg_blocktime_day=float(bcStatsDaily['block_interval_min'])
-
-	avg_blocktime_day_secs=avg_blocktime_day-int(avg_blocktime_day)
-	avg_blocktime_day_secs=str(int(avg_blocktime_day_secs*60))
-	avg_blocktime_day=int(avg_blocktime_day)
-
-	price=float(requests.get('https://api.coinbase.com/v2/prices/spot?currency=USD').json()['data']['amount'])
+	totalBtc=float("%.8f" % float(requests.get('http://chainz.cryptoid.info/grs/api.dws?q=totalcoins')))
+	block_count=int(requests.get('http://chainz.cryptoid.info/grs/api.dws?q=getblockcount'))
+	difficulty=float(requests.get('http://chainz.cryptoid.info/grs/api.dws?q=getdifficulty'))
+	hashrate_day=float(requests.get('http://chainz.cryptoid.info/grs/api.dws?q=hashrate'))
+	price=float(requests.get('https://chainz.cryptoid.info/grs/api.dws?q=ticker.usd'))
 
 	#adding commas to data
-	block_count=str("{:,d}".format(block_count))
 	totalBtc=str("{:,f}".format(totalBtc))
+	block_count=str("{:,d}".format(block_count))
 	difficulty=str("{:,f}".format(difficulty))
-
-	blocks_day=str("{:,d}".format(blocks_day))
-	outputs_day=str("{:,f}".format(outputs_day))
-	fees_day=str("{:,f}".format(fees_day))
-	avg_blocktime_day=str("{:,d}".format(avg_blocktime_day))
 	hashrate_day=str("{:,f}".format(hashrate_day))
-
 	#one can only hope this is necessary...
 	priceUSD=str("{:,.2f}".format(price))
 
-
 	#adding data to description:
-	description+="**Total bitcoins:** " + totalBtc + nl
+	description+="**Total groestlcoins:** " + totalBtc + nl
 	description+="**Height:** " + block_count + nl
 	description+="**Difficulty:** " + difficulty + nl
 
 	description+="######Statistics for the past 24 hours:" + nl
-	description+="**Number of blocks mined:** " + blocks_day + nl
-	description+="**Total bitcoins output (amount sent):** " + outputs_day  + nl
-	description+="**Total fees:** " + fees_day + nl
-	description+="**Average time until block found:** " + avg_blocktime_day + " minutes, " + avg_blocktime_day_secs + " seconds" + nl
 	description+="**Estimated hashrate:** " + hashrate_day + " gh/s" + nl
 	description+="**Current price:** US$" + priceUSD + nl
 
-	description+="*Data provided by [Smartbit.com.au](https://www.smartbit.com.au). Price data provided by [Coinbase.com](https://www.coinbase.com).*" + nl
+	description+="*Data provided by [cryptoid](https://chainz.cryptoid.info/).*" + nl
 
 	description+="***" + nl
 
-	description+="^^I ^^am ^^a ^^bot. **[^^My ^^commands](https://www.reddit.com/r/Bitcoin/comments/3an2c4/ive_been_working_on_a_bot_for_crypto_subs_like/)** ^^| ^^*/r/crypto_bot* ^^| [^^Message ^^my ^^creator](https://www.reddit.com/message/compose?to=busterroni) ^^| [^^Source ^^code](https://github.com/busterroni/crypto_bot)"
+	description+="^^I ^^am ^^a ^^bot. **[^^Message ^^my ^^creator](https://www.reddit.com/message/compose?to=jackielove4u) ^^| [^^Source ^^code](https://github.com/Groestlcoin/crypto_bot)"
 
 	return description
 
